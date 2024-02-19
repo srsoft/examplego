@@ -2,7 +2,7 @@ FROM golang:stretch AS builder
 
 WORKDIR $GOPATH/src/golang-gorm
 
-RUN ["echo", $GOPATH]
+CMD ["echo", $GOPATH]
 
 COPY go.mod go.sum ./
 RUN cd $GOPATH/src/golang-gorm && go mod download
