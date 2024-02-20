@@ -8,6 +8,7 @@ pipeline {
         CGO_ENABLED = 0 
         GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
     }
+    def app
     stages {
         // stage("unit-test") {
         //     steps {
@@ -21,8 +22,7 @@ pipeline {
         //         sh 'make functional-tests'
         //     }
         // }
-
-
+        
         // stage("build") {
         //     steps {
         //         echo 'BUILD EXECUTION STARTED'
@@ -40,14 +40,13 @@ pipeline {
         //         }
         //     }
         // }
-        def app
 
         stage('Clone repository') {
             checkout scm
         }
 
         stage('Build image') {
-            app = docker.build("example/go")
+        app = docker.build("example/go")
         }
 
         stage('Test image') {
