@@ -26,15 +26,15 @@ pipeline {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'docker build . -t example/go'
+                sh 'docker build . -t neopubl/go'
             }
         }
         stage('deliver') {
             agent any
             steps {
-                withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'harborPassword', usernameVariable: 'harborUser')]) {
-                sh "docker login -u ${env.harborUser} -p ${env.harborPassword} https://harbor.ks.io:8443"
-                sh 'docker push example/go'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerhubPassword', usernameVariable: 'dockerhubUser')]) {
+                sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPassword}"
+                sh 'docker push neopubl/go'
                 }
             }
         }
