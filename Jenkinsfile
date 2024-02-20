@@ -23,7 +23,9 @@ pipeline {
         // }
 
         stage('Clone repository') {
-            checkout scm
+            steps {
+                checkout scm
+            }
         }     
         
         stage("Build image") {
@@ -52,8 +54,10 @@ pipeline {
         }
 
         stage('Trigger ManifestUpdate') {
-            echo "triggering updatemanifestjob"
-            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            steps {
+                echo "triggering updatemanifestjob"
+                build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            }
         }        
 
     }
