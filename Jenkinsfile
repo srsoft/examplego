@@ -22,7 +22,7 @@ pipeline {
                 echo "env.BUILD_NUMBER: ${env.BUILD_NUMBER}"
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'docker build . -t harbor.ks.io:8443/example/go'
+                sh "docker build . -t harbor.ks.io:8443/example/go:${env.BUILD_NUMBER}"
             }
         }
 
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'harborPassword', usernameVariable: 'harborUser')]) {
                     sh "docker login -u ${env.harborUser} -p ${env.harborPassword} https://harbor.ks.io:8443"
-                    sh 'docker push harbor.ks.io:8443/example/go'
+                    sh "docker push harbor.ks.io:8443/example/go:${env.BUILD_NUMBER}"
                 }
             }
         }
