@@ -27,7 +27,7 @@ pipeline {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'docker build . -t example/go'
+                sh 'docker build . -t harbor.ks.io:8443/example/go'
             }
         }
         stage('deliver') {
@@ -37,7 +37,7 @@ pipeline {
                     echo "withCredentials user: ${env.harborUser}"
                     echo "withCredentials pass: ${env.harborPassword}"
                     sh "docker login -u ${env.harborUser} -p ${env.harborPassword} https://harbor.ks.io:8443"
-                    sh 'docker push example/go'
+                    sh 'docker push harbor.ks.io:8443/example/go'
                 }
             }
         }
