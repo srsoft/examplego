@@ -9,18 +9,6 @@ pipeline {
         GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
     }
     stages {
-        // stage("unit-test") {
-        //     steps {
-        //         echo 'UNIT TEST EXECUTION STARTED'
-        //         sh 'make unit-tests'
-        //     }
-        // }
-        // stage("functional-test") {
-        //     steps {
-        //         echo 'FUNCTIONAL TEST EXECUTION STARTED'
-        //         sh 'make functional-tests'
-        //     }
-        // }
 
         stage('Clone repository') {
             steps {
@@ -31,6 +19,7 @@ pipeline {
         stage("Build image") {
             steps {
                 echo 'BUILD EXECUTION STARTED'
+                echo "env.BUILD_NUMBER: ${env.BUILD_NUMBER}"
                 sh 'go version'
                 sh 'go get ./...'
                 sh 'docker build . -t harbor.ks.io:8443/example/go'
@@ -40,6 +29,7 @@ pipeline {
         stage("Test image") {
             steps {
                 echo 'UNIT TEST EXECUTION STARTED'
+                echo "env.BUILD_NUMBER: ${env.BUILD_NUMBER}"
             }
         }        
 
