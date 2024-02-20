@@ -21,8 +21,12 @@ pipeline {
         //         sh 'make functional-tests'
         //     }
         // }
+
+        stage('Clone repository') {
+            checkout scm
+        }     
         
-        stage("build") {
+        stage("Build image") {
             steps {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
@@ -30,17 +34,27 @@ pipeline {
                 sh 'docker build . -t harbor.ks.io:8443/example/go'
             }
         }
-        stage('deliver') {
+
+        stage("Test image") {
+            steps {
+                echo 'UNIT TEST EXECUTION STARTED'
+            }
+        }        
+
+        stage('Push image') {
             agent any
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'harborPassword', usernameVariable: 'harborUser')]) {
-                    echo "withCredentials user: ${env.harborUser}"
-                    echo "withCredentials pass: ${env.harborPassword}"
                     sh "docker login -u ${env.harborUser} -p ${env.harborPassword} https://harbor.ks.io:8443"
                     sh 'docker push harbor.ks.io:8443/example/go'
                 }
             }
         }
+
+        stage('Trigger ManifestUpdate') {
+            echo "triggering updatemanifestjob"
+            build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+        }        
 
     }
 
