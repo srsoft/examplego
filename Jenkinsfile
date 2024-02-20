@@ -21,47 +21,22 @@ pipeline {
         //         sh 'make functional-tests'
         //     }
         // }
-
-        stage('Clone repository') {
-            steps {
-                checkout scm
-            }
-        }     
-        
-        stage("Build image") {
+        stage("build") {
             steps {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'docker build . -t harbor.ks.io:8443/example/go'
+                sh 'docker build . -t neopubl/go'
             }
         }
-
-        stage("Test image") {
-            steps {
-                echo 'UNIT TEST EXECUTION STARTED'
-            }
-        }        
-
-        stage('Push image') {
+        stage('deliver') {
             agent any
             steps {
-                withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'harborPassword', usernameVariable: 'harborUser')]) {
-                    sh "docker login -u ${env.harborUser} -p ${env.harborPassword} https://harbor.ks.io:8443"
-                    sh 'docker push harbor.ks.io:8443/example/go'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerhubPassword', usernameVariable: 'dockerhubUser')]) {
+                sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPassword}"
+                sh 'docker push neopubl/go'
                 }
             }
         }
-
-        stage('Trigger ManifestUpdate') {
-            steps {
-                echo "triggering updatemanifestjob"
-                build job: 'updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
-            }
-        }        
-
     }
-
-
-
 }
